@@ -1,0 +1,28 @@
+A Deployment is a Kubernetes object that creates and manages Pods and keeps them running in desired state.
+
+how to create deployments
+
+3 way to create deployments
+
+method 1 - 
+
+kubectl create deployment app1 --image=nginx
+
+what is does 
+- create deploymens
+- create replicas
+- create 1 Pod
+
+add more replicas?
+
+kubectl scale deployment app1 replicas=3
+
+check deployments and pods
+
+kubectl get deployments
+
+kubectl get pods
+
+method 2 - 
+
+using yaml file
