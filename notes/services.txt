@@ -49,3 +49,28 @@ More specifically:
 
 Service acts like:
  - smart traffic router
+
+ ports:
+  - name:
+    protocol:
+    port:
+    targetPort:
+    nodePort:
+    appProtocol:
+
+Field	    Required?
+port	    ✅ YES
+targetPort	❌ optional
+protocol	❌ optional
+name	⚠ conditionally required
+nodePort	❌ optional
+appProtocol	❌ optional
+
+Use meaningful names:
+
+Port Purpose	Common Name
+HTTP	        http
+HTTPS	        https
+metrics	        metrics
+gRPC	        grpc
+

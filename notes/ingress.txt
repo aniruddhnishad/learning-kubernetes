@@ -1,0 +1,39 @@
+####REAL ARCHITECTURE
+Users
+  ↓
+https://myapp.com
+  ↓
+Ingress Controller
+  ↓
+frontend-service (ClusterIP)
+  ↓
+frontend Pods
+
+frontend Pods
+  ↓
+backend-service (ClusterIP)
+  ↓
+backend Pods
+
+backend Pods
+  ↓
+mysql-service (ClusterIP)
+  ↓
+MySQL Pod
+
+####IMPORTANT
+Only: Ingress Controller is public. Everything else stays internal.
+
+####HOW DOES INGRESS WORK?
+
+Ingress Controller is basically:
+
+nginx reverse proxy inside Kubernetes
+
+Internet
+  ↓
+NGINX Ingress
+  ↓
+Service
+  ↓
+Pods

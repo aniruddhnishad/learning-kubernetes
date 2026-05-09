@@ -1,0 +1,11 @@
+INTERVIEW GOLD QUESTION
+Why is Ingress preferred over NodePort in production?
+
+Because Ingress provides:
+
+centralized routing
+TLS termination
+virtual hosting
+path-based routing
+better scalability
+clean ports 80/443
