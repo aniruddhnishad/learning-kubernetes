@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: lightspeed
+  labels:
+    app: lightspeed
+
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: lightspeed
+  
+  template:
+    metadata:
+      labels:
+        app: lightspeed
+    
+    spec:
+      containers:
+         - image: litespeedtech/litespeed
+           name: lightspeed
+           ports:
+             - containerPort: 80

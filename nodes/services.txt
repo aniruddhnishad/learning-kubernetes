@@ -1,0 +1,51 @@
+Pods are 
+- temporary
+- created often
+- ip changes constanly
+
+Service provide
+- stable ip
+- stable dns name
+- loadbalancing
+- abstraction over pods
+
+A Service is a stable networking layer that exposes Pods and load balances traffic to them.
+
+Services does not talk directly to deployment
+
+it taks to pods using selector.
+
+2 way to create Service
+
+1 - kubectl expose deploymen app1 --port=80 type=NodePort ## kubectl expose app1 --port=80 type=LoadBalancer
+## kubectl expose deployment app1   --type=NodePort   --name=app1-service 
+
+##this assign port like 30867 where i we can see app like http://85.208.9.197:30867/
+
+##kubectl expose deployment httpdv1   --type=NodePort   --name=httpdv1-service
+
+kubectl expose deployment httpdv1   --type=LoadBalancer   --name=httpdv1load-service
+service/httpdv1load-service exposed
+
+
+kubectl get svc -o wide
+NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE     SELECTOR
+app1-service          NodePort       10.97.98.85     <none>        80:30867/TCP   5m34s   app=app1
+httpdv1-service       NodePort       10.106.59.171   <none>        80:31958/TCP   2m7s    webserver=httpd
+httpdv1load-service   LoadBalancer   10.104.231.73   <pending>     80:31483/TCP   4s      webserver=httpd
+kubernetes            ClusterIP      10.96.0.1       <none>        443/TCP        28h     <none>
+
+
+What kubectl expose deployment does?
+ - Kubernetes automatically creates a Service for your Deployment.
+
+In simple terms
+
+ - It “publishes your application inside the cluster”
+
+More specifically:
+
+ - It creates a stable network endpoint so Pods can be accessed.
+
+Service acts like:
+ - smart traffic router

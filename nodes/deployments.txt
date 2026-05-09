@@ -2,7 +2,7 @@ A Deployment is a Kubernetes object that creates and manages Pods and keeps them
 
 how to create deployments
 
-3 way to create deployments
+2 way to create deployments
 
 method 1 - 
 

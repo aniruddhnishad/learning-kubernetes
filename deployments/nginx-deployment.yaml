@@ -1,24 +1,23 @@
-appVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata: 
     name: app1
     labels:
       app: app1
-    testmeta: whatiknow
 spec:
   replicas: 5
   selector:
     matchLabels:
       app: app1
-  templete:
+  template:
     metadata:
       labels:
         app: app1
     spec:
       containers:
-        image: nginx
-        name: nginx
-        ports:
-         containerPort: 80
+       - image: nginx
+         name: nginx
+         ports:
+         - containerPort: 80
 
 

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd-service
+  labels:
+    app: httpd-service
+
+spec:
+  type: NodePort
+
+  selector:
+    webserver: httpd
+
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8084 # node internal port
+      targetPort: 80 #pod container port #this is optional if only port is given then it also assigned the same port 
+      nodePort: 30000-32767 # external port #only allow type: Nodeport and type: LoadBalancer # this is optional also

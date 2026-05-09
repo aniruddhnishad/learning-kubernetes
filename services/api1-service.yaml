@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1-service
+  labels:
+    app: app1-service
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: app1 #must match the pod label
+
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80 #service port can be access within serve
+      targetPort: 80 #pod container port
+      #nodePort: 80 # External port where client connect #this is not allow in type: ClusterIp
+
+#port = inside cluster
+#nodePort = outside cluster

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache2
+  labels:
+    app: apache2
+
+spec:
+  replicas: 5
+  selector: 
+    matchLabals:
+      labals:
+        app: apache2
+  template:
+    metadata:
+      labals:
+        app: apache2
+    spec:
+      containers:
+        image: ubuntu/apache2
+        name: apache2
+        port:
+          containerPort: 80
