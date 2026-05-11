@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: litespeed-service
+  labels:
+    app: litespeed-service
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: lightspeed
+  
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      #nodePort: 31056 #not for ClusterIP

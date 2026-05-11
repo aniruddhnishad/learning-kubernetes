@@ -9,3 +9,17 @@ virtual hosting
 path-based routing
 better scalability
 clean ports 80/443
+
+Can we update ConfigMap without restarting pod?
+
+👉 Yes (if mounted as volume)
+
+But env vars require restart.
+
+Why base64 in Secret?
+
+Not security — just encoding for safe transport.
+
+Where are secrets stored?
+
+Inside etcd (Kubernetes database)

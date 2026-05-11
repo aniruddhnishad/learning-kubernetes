@@ -8,14 +8,17 @@ spec:
   ingressClassName: nginx
 
   rules:
-    - http:
+    - host: t.ubuntu.io
+
+      http:
         paths:
-          - path: /app1
+          - path: /
             pathType: Prefix
 
             backend:
               service:
                 name: app1-service
-
                 port:
                   number: 80
+
+
