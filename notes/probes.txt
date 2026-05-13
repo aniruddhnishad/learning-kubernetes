@@ -1,0 +1,116 @@
+Probes (Liveness + Readiness + Startup)
+
+WHY PROBES EXIST
+
+Real apps:
+
+ - crash
+ - hang
+ - become slow
+ - stop responding
+ - need warmup time
+
+Without probes:
+
+Kubernetes cannot detect bad apps properly
+
+THREE TYPES OF PROBES
+Probe	        Purpose
+livenessProbe	should pod be restarted?
+readinessProbe	should pod receive traffic?
+startupProbe	is app still starting?
+
+
+LIVENESS PROBE
+
+Asks: "Is app alive?"
+
+If FAILED:
+
+ - Kubernetes restarts container
+
+READINESS PROBE
+
+Asks: "Is app ready for traffic?"
+
+If FAILED:
+
+ - removed from Service endpoints
+
+ - NO restart.
+
+STARTUP PROBE
+
+Asks: "Is app still booting?"
+
+Useful for:
+ - Java
+ - Spring Boot
+ - heavy apps
+
+################################################################
+
+livenessProbe: app crash restart the container
+
+readinessProbe: 
+
+ - If readiness fails: Service removes pod from endpoints. Traffic stops going there.
+BUT:
+ - pod still running
+ - no restart
+
+
+
+initialDelaySeconds
+  initialDelaySeconds: 5 #Wait before first check.
+
+Useful because app may need startup time.
+
+periodSeconds
+ periodSeconds: 10 #Run probe every 10 sec.
+
+timeoutSeconds
+
+ - How long probe waits.
+
+failureThreshold
+
+ - How many failures before action.
+
+successThreshold
+
+ - How many successes before healthy again.
+
+
+TYPES OF PROBES check
+Type	    Description
+httpGet	    HTTP endpoint
+tcpSocket	TCP port check
+exec	    run command inside container
+
+HTTP PROBE EXAMPLE
+livenessProbe:
+  httpGet:
+    path: /
+    port: 80
+
+EXEC PROBE EXAMPLE
+livenessProbe:
+  exec:
+    command:
+      - cat
+      - /tmp/healthy
+
+TCP PROBE EXAMPLE
+livenessProbe:
+  tcpSocket:
+    port: 3306
+
+startupProbe:
+  allows slow startup
+
+readinessProbe:
+  checks DB connection
+
+livenessProbe:
+  checks app health

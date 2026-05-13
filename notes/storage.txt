@@ -1,0 +1,328 @@
+Persistent Storage (PV, PVC, StorageClass)
+
+This is where Kubernetes becomes capable of running:
+
+ - databases
+ - uploads
+ - WordPress
+ - Redis
+ - PostgreSQL
+ - MySQL
+ - Jenkins
+ - Grafana
+ - Prometheus
+
+Without storage:
+
+ - pod restart = data lost
+
+#######################################################
+
+Suppose MySQL pod stores data inside container.
+
+Pod crashes.
+
+Kubernetes creates new pod.
+
+Result:
+
+DATABASE GONE
+
+because old container filesystem vanished.
+
+#########################################
+
+STORAGE ARCHITECTURE
+Pod
+ ↓
+PVC (request)
+ ↓
+PV (actual disk)
+ ↓
+Physical storage
+
+######################################
+
+MOST IMPORTANT CONCEPT
+PV = PersistentVolume
+
+Actual storage resource.
+
+Example:
+
+disk
+SSD
+NFS
+cloud volume
+
+###############################
+PVC = PersistentVolumeClaim
+
+Storage request from application.
+
+Example:
+
+"I need 5Gi storage"
+
+####################################
+
+THINK LIKE THIS
+Kubernetes	Real World
+PV	        actual hard disk
+PVC	        request form for disk
+
+##################################
+
+SIMPLEST STORAGE FLOW
+Pod
+ ↓ mounts
+PVC
+ ↓ bound to
+PV
+ ↓ backed by
+disk
+
+
+ACCESS MODES
+ReadWriteOnce (RWO)
+ - mounted by one node
+
+ - Most common.
+
+ReadOnlyMany (ROX)
+
+ - Multiple readers.
+
+ReadWriteMany (RWX)
+
+ - Multiple nodes can write.
+
+ - Needs:
+    - NFS
+    - Ceph
+    - shared storage
+
+
+REAL PRODUCTION STORAGE
+
+Uses:
+
+   - EBS
+   - Ceph
+   - Longhorn
+   - NFS
+   - SAN
+   - CSI drivers
+
+RECLAIM POLICIES
+
+    Policy	Meaning
+
+    Retain	keep data
+    Delete	remove storage
+    Recycle	old/rare
+
+
+You have:
+
+PV = 1Gi
+PVC request = 500Mi
+
+But PVC shows:
+
+CAPACITY = 1Gi
+
+and you are asking:
+
+👉 then what is the use of requesting 500Mi?
+
+VERY important concept.
+
+🧠 SHORT ANSWER
+
+PVC request means:
+
+minimum storage needed
+
+NOT:
+
+exact allocated size
+🚀 YOUR CURRENT CASE
+
+Your PV:
+
+capacity:
+  storage: 1Gi
+
+PVC:
+
+resources:
+  requests:
+    storage: 500Mi
+
+Kubernetes checks:
+
+Is there any PV >= 500Mi ?
+
+YES:
+
+pv1 has 1Gi
+
+So PVC binds to entire PV.
+
+🧠 VERY IMPORTANT RULE
+
+PVC does NOT slice PV.
+
+It binds:
+
+👉 whole PV
+🚀 VISUAL EXPLANATION
+
+You have:
+
+PV = 1Gi disk
+
+PVC says:
+
+I need at least 500Mi
+
+Kubernetes replies:
+
+Here is 1Gi volume
+Take whole thing
+🚨 VERY IMPORTANT
+
+After binding:
+
+PV cannot be shared
+
+with another PVC (usually with RWO).
+
+🚀 REAL ANALOGY
+
+Think like hotel room.
+
+HOTEL ROOM ANALOGY
+
+Hotel room size:
+
+1Gi
+
+Customer asks:
+
+Need minimum 500Mi
+
+Hotel gives:
+
+entire 1Gi room
+
+Remaining unused space:
+
+still reserved
+cannot be given to another guest
+🧠 THEN WHY REQUEST SIZE EXISTS?
+
+VERY important.
+
+PVC request helps Kubernetes:
+
+select matching PV
+dynamic provisioning
+scheduling decisions
+quotas
+storage planning
+🚀 MATCHING LOGIC
+
+Suppose:
+
+PV	Size
+pv1	1Gi
+pv2	10Gi
+pv3	100Gi
+
+PVC requests:
+
+storage: 500Mi
+
+Kubernetes usually picks:
+
+👉 smallest matching PV
+
+Likely:
+
+pv1
+🚀 IF PVC REQUESTS 5Gi
+
+Then:
+
+pv1 rejected
+pv2 selected
+🚀 DYNAMIC PROVISIONING (MOST IMPORTANT)
+
+In cloud production:
+
+PVC request directly creates disk.
+
+Example:
+
+requests:
+  storage: 20Gi
+
+Cloud provider creates:
+
+👉 20Gi EBS volume
+
+So request size becomes VERY important.
+
+🧠 IN STATIC PV MODE (YOUR CURRENT LAB)
+
+Request size mainly used for:
+
+matching PV
+
+Actual PV size remains:
+
+full volume size
+🚀 WHY PVC SHOWS 1Gi
+
+Because bound PV has:
+
+1Gi actual capacity
+
+PVC now attached to that full PV.
+
+🚨 IMPORTANT INTERVIEW QUESTION
+❓ Does PVC allocate exact requested size from PV?
+
+❌ No.
+
+PVC binds whole matching PV.
+
+################################################
+
+CSI DRIVER (MOST IMPORTANT)
+
+Before CSI existed:
+
+every storage vendor integrated differently
+
+Huge mess.
+
+Now Kubernetes uses:
+
+👉 CSI = Container Storage Interface
+
+Standard API for storage plugins.
+
+##################################
+CSI DRIVER IS LIKE
+USB driver for storage
+
+It lets Kubernetes talk to:
+
+AWS
+Ceph
+Azure
+NFS
+etc.
