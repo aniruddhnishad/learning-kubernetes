@@ -1,0 +1,179 @@
+STEP 1 — INSTALL METRICS SERVER
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+VERIFY
+kubectl top nodes
+
+If working:
+
+CPU usage shown
+memory usage shown
+🚀 STEP 2 — CREATE DEPLOYMENT
+
+Example:
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: nginx-hpa
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+      labels:
+        app: nginx
+
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+🚨 IMPORTANT
+
+HPA requires:
+
+👉 CPU requests
+
+Without requests:
+
+HPA cannot calculate utilization
+
+VERY important.
+
+APPLY
+kubectl apply -f deployment.yaml
+🚀 STEP 3 — CREATE SERVICE
+kubectl expose deployment nginx-hpa \
+  --port=80 \
+  --target-port=80 \
+  --type=NodePort
+🚀 STEP 4 — CREATE HPA
+CLI METHOD
+kubectl autoscale deployment nginx-hpa \
+  --cpu-percent=50 \
+  --min=1 \
+  --max=10
+WHAT THIS MEANS
+Setting	Meaning
+cpu-percent=50	target average CPU
+min=1	minimum pods
+max=10	maximum pods
+🚀 VERIFY
+kubectl get hpa
+🚀 WATCH LIVE
+kubectl get hpa -w
+🚀 STEP 5 — GENERATE LOAD
+
+Run temporary busybox pod:
+
+kubectl run -it --rm load-generator \
+  --image=busybox \
+  -- sh
+
+Inside shell:
+
+while true; do wget -q -O- http://SERVICE_NAME; done
+
+Replace:
+
+SERVICE_NAME
+
+with actual service name.
+
+🚀 WATCH SCALING
+
+In another terminal:
+
+kubectl get pods -w
+
+You should see:
+
+1 pod
+2 pods
+3 pods
+
+HPA scales automatically.
+
+
+YAML VERSION (PRODUCTION STYLE)
+hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+
+metadata:
+  name: nginx-hpa
+
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-hpa
+
+  minReplicas: 1
+  maxReplicas: 10
+
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+
+        target:
+          type: Utilization
+          averageUtilization: 50
+APPLY
+kubectl apply -f hpa.yaml
+🧠 VERY IMPORTANT PRODUCTION CONCEPT
+
+HPA changes:
+
+replicas:
+
+automatically.
+
+Do NOT manually fight HPA.
+
+🚀 SCALING FLOW
+Traffic ↑
+   ↓
+CPU ↑
+   ↓
+HPA detects
+   ↓
+Deployment replicas increased
+   ↓
+More pods created
+🚀 WHAT HPA CANNOT DO
+
+HPA cannot:
+
+create new nodes
+increase RAM
+increase CPU
+
+It only:
+
+👉 changes pod count
+🚀 CLUSTER AUTOSCALER
+
+Different component.
+
+Adds/removes nodes.
+
+🚀 HPA VS CLUSTER AUTOSCALER
+Feature	HPA	Cluster Autoscaler
+scales pods	✅	❌
+scales nodes	❌	✅

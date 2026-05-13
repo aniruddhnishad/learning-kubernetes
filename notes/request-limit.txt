@@ -1,0 +1,280 @@
+Resource Requests & Limits
+
+This is one of the MOST IMPORTANT Kubernetes topics.
+
+This controls:
+
+CPU
+RAM
+scheduling
+stability
+OOMKilled problems
+noisy neighbor problems
+autoscaling
+
+###THE CORE PROBLEM
+
+Suppose one pod uses:
+
+100% CPU
+all RAM
+
+Then:
+
+ - other apps become slow
+ - node crashes
+ - Kubernetes unstable
+
+Need resource control.
+
+####KUBERNETES SOLUTION
+
+Each container can define:
+
+Type	       Meaning
+requests	   minimum guaranteed
+limits	       maximum allowed
+
+###REQUESTS
+ - minimum resources needed
+
+Used by: scheduler
+
+###LIMITS
+maximum container can use
+
+Enforced by:
+ - Linux cgroups
+ - kubelet
+
+requests:
+  cpu: "200m"
+  memory: "128Mi"
+
+limits:
+  cpu: "500m"
+  memory: "256Mi"
+
+Means:
+
+Resource	      Meaning
+request CPU	      guaranteed 0.2 CPU
+limit CPU	      max 0.5 CPU
+request memory	  guaranteed 128Mi
+limit memory	   max 256Mi
+
+###WHAT IS "m" CPU?
+
+###CPU UNITS
+
+Value	Meaning
+1000m	1 CPU core
+500m	0.5 CPU
+200m	0.2 CPU
+
+###MEMORY UNITS
+
+Value	Meaning
+Mi	    mebibyte
+Gi	    gibibyte
+
+##################################
+
+######WHAT SCHEDULER DOES
+
+Suppose node has:
+
+ - 1 CPU
+ - 1GB RAM
+
+Pod requests:
+
+ - 500m CPU
+ - 512Mi RAM
+
+Scheduler checks:
+
+ - enough resources available?
+
+If yes:
+
+ - pod scheduled
+
+If no:
+
+ - pod Pending
+
+##VERY IMPORTANT
+
+Scheduler uses: requests not limits.
+
+###################################
+
+#####MEMORY LIMIT BEHAVIOR
+
+If container exceeds:
+
+memory: 256Mi
+
+Linux kernel kills process.
+
+Pod gets:
+
+ - OOMKilled
+
+ - VERY common production issue.
+
+###################################
+
+CPU LIMIT BEHAVIOR
+
+CPU limit does NOT kill pod.
+
+Instead:
+
+ - throttles CPU
+
+ - Container becomes slower.
+
+##MEMORY VS CPU DIFFERENCE
+Resource	     LIMIT                  Behavior
+memory       limit exceeded	        container killed
+cpu          limit exceeded	        throttled
+
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+GOOD PRACTICE
+
+Always define:
+
+requests
+limits
+🚀 QoS CLASSES (VERY IMPORTANT)
+
+Kubernetes assigns QoS classes.
+
+Guaranteed
+
+Requests == limits
+
+Highest priority.
+
+Burstable
+
+Requests < limits
+
+Most common.
+
+BestEffort
+
+No requests/limits.
+
+Lowest priority.
+
+Killed first during pressure.
+
+🚨 INTERVIEW GOLD QUESTION
+❓ Difference between requests and limits?
+Requests	Limits
+scheduling guarantee	maximum allowed
+🧠 INTERVIEW QUESTION
+❓ What happens if memory limit exceeded?
+
+Container killed (OOMKilled).
+
+🧠 INTERVIEW QUESTION
+❓ What happens if CPU limit exceeded?
+
+CPU throttled.
+
+🧠 TRICKY INTERVIEW QUESTION
+❓ Does scheduler use limits?
+
+❌ No.
+
+Scheduler uses requests.
+
+🧠 INTERVIEW QUESTION
+❓ Why requests important?
+
+Prevent over-scheduling nodes.
+
+🚀 REAL PRODUCTION KNOWLEDGE
+
+Many Kubernetes outages happen because:
+
+no memory limits
+JVM memory misconfigured
+requests too low
+node overcommitted
+
+This topic is EXTREMELY important in real jobs.
+
+🧠 MEMORY MODEL
+requests =
+minimum guaranteed
+
+limits =
+maximum allowed
+
+requests: minimum requirement to scheduled pod, check during the pod is being scheduled.
+
+limit: maximum resurce can use after the pod start and enforce the limit during runtime.
+
+MOST IMPORTANT CONCEPT
+
+Requests are:
+
+👉 reservation
+
+Limits are:
+
+👉 protection
+
+#####################################
+
+WHAT IF ONLY REQUESTS GIVEN?
+
+Example:
+
+requests:
+  memory: 256Mi
+
+No limits.
+
+Result:
+
+ - scheduler reserves 256Mi
+ - container can consume unlimited memory
+
+ - Dangerous.
+
+##################################
+
+REAL PRODUCTION STRATEGY
+
+Most companies use:
+
+requests < limits
+
+Called:
+
+👉 Burstable QoS
+
+#######################################
+THINK LIKE HOTEL BOOKING
+REQUESTS
+
+Like:
+
+ - minimum room size needed
+
+ - Hotel scheduler uses this to assign room.
+
+LIMITS
+
+Like:
+
+ - maximum electricity usage allowed
+
+ - Enforced after guest enters room.

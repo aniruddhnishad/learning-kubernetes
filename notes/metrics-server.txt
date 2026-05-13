@@ -1,0 +1,49 @@
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+STEP 3 — VERY COMMON VPS FIX
+
+On VPS/homelab clusters,
+Metrics Server often fails because:
+
+👉 kubelet certificates
+
+Need patch.
+
+run below command
+
+kubectl patch deployment metrics-server -n kube-system \
+  --type='json' \
+  -p='[
+    {
+      "op":"add",
+      "path":"/spec/template/spec/containers/0/args/-",
+      "value":"--kubelet-insecure-tls"
+    }
+  ]'
+
+##############################################
+
+###VERY COMMON FIX #2 (IMPORTANT)
+
+Many VPS clusters need BOTH:
+
+--kubelet-insecure-tls
+--kubelet-preferred-address-types=InternalIP
+
+because kubelet hostname resolution fails.
+
+PATCH AGAIN
+
+Run:
+
+kubectl patch deployment metrics-server -n kube-system \
+  --type='json' \
+  -p='[
+    {
+      "op":"add",
+      "path":"/spec/template/spec/containers/0/args/-",
+      "value":"--kubelet-preferred-address-types=InternalIP"
+    }
+  ]'
+
+kubectl get pods -n kube-system -w

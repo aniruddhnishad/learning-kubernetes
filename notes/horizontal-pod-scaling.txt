@@ -1,0 +1,94 @@
+HPA — Horizontal Pod Autoscaler
+
+This is where Kubernetes becomes truly “cloud-native”.
+
+HPA automatically:
+
+increases pods during traffic spikes
+decreases pods when traffic drops
+
+################################################
+Suppose your app has:
+
+2 pods
+
+Suddenly:
+
+ - traffic increases
+ - CPU becomes 95%
+
+Users experience:
+
+ - slow response
+ - timeouts
+ - crashes
+
+Manually scaling is bad.
+
+🚀 HPA SOLUTION
+
+Kubernetes watches metrics:
+
+ - CPU
+ - memory
+ - custom metrics
+
+Then automatically:
+
+High load
+   ↓
+increase replicas
+
+Low load
+   ↓
+decrease replicas
+
+###########################
+🚀 EXAMPLE
+
+Without HPA:
+
+2 pods forever
+
+With HPA:
+
+2 pods → 5 pods → 10 pods
+
+depending on traffic.
+
+######################################
+
+VERY IMPORTANT CONCEPT
+
+HPA scales Deployments not individual pods.
+
+###############################################
+
+REQUIREMENTS
+
+Before HPA:
+
+ - metrics-server installed
+ - deployment has CPU requests
+
+VERY important:
+ - HPA uses: requests to calculate utilization.
+
+ INTERVIEW QUESTIONS FROM HPA
+
+Very common:
+
+❓ What does HPA scale?
+
+ - Deployments/ReplicaSets.
+
+❓ Does HPA create nodes?
+
+❌ No.
+
+That is: Cluster Autoscaler
+
+❓ What metrics can HPA use?
+ - CPU
+ - memory
+ - custom metrics

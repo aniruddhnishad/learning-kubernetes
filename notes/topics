@@ -1,0 +1,23 @@
+Next topics:
+Helm
+Ingress NGINX
+Persistent Volumes
+Secrets
+ConfigMaps
+Monitoring
+ArgoCD
+CI/CD pipelines
+Multi-node setup
+
+AFTER THIS TOPIC
+
+Best next production topics:
+
+HPA (Horizontal Pod Autoscaler)
+StatefulSet
+DaemonSet
+Jobs/CronJobs
+Helm
+RBAC
+Taints/Tolerations
+Affinity/AntiAffinity
