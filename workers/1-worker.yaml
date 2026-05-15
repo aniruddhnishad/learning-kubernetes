@@ -1,0 +1,10 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: JoinConfiguration
+discovery:
+  bootstrapToken:
+    token: "your.token.here"
+    apiServerEndpoint: "master-ip:6443"
+    caCertHashes: ["sha256:your-hash-here"]
+nodeRegistration:
+  kubeletExtraArgs:
+    resolv-conf: "/etc/resolv.conf"
